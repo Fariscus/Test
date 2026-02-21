@@ -1,4 +1,6 @@
 package hello.test.Repos;
 
-public class UserRepository {
-}
+import hello.test.Model.User;
+import org.springframework.data.repository.CrudRepository;
+
+public interface UserRepository extends CrudRepository<User, Long> {}

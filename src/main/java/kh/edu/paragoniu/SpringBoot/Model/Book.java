@@ -2,14 +2,12 @@ package kh.edu.paragoniu.SpringBoot.Model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,42 +17,48 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")
+@Table(name = "books")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
-
+public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Name is mandatory")
-    @Column(nullable = false)
-    private String name;
-
-    @NotBlank(message = "Email is mandatory")
-    @Email(message = "Please provide a valid email address")
+    @NotBlank(message = "ISBN is mandatory")
     @Column(nullable = false, unique = true)
-    private String email;
+    private String isbn;
 
-    @Enumerated(EnumType.STRING)
+    @NotBlank(message = "Title is mandatory")
     @Column(nullable = false)
-    private Role role;
+    private String title;
 
+    @NotBlank(message = "Author is mandatory")
     @Column(nullable = false)
-    private boolean active;
+    private String author;
+
+    @NotBlank(message = "Category is mandatory")
+    @Column(nullable = false)
+    private String category;
+
+    @Min(value = 1, message = "Total copies must be at least 1")
+    @Column(nullable = false)
+    private Integer totalCopies;
+
+    @Min(value = 0, message = "Available copies cannot be negative")
+    @Column(nullable = false)
+    private Integer availableCopies;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     public void prePersist() {
-        if (role == null) {
-            role = Role.USER;
+        if (availableCopies == null) {
+            availableCopies = totalCopies;
         }
-        active = true;
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }

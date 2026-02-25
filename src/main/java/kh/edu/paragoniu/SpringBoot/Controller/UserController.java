@@ -1,8 +1,8 @@
-package hello.test.Controller;
+package kh.edu.paragoniu.SpringBoot.Controller;
 
 import org.springframework.ui.Model;
-import hello.test.Model.User;
-import hello.test.Repos.UserRepository;
+import kh.edu.paragoniu.SpringBoot.Model.User;
+import kh.edu.paragoniu.SpringBoot.Repos.UserRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;

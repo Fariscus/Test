@@ -1,6 +1,6 @@
-package hello.test.Repos;
+package kh.edu.paragoniu.SpringBoot.Repos;
 
-import hello.test.Model.User;
+import kh.edu.paragoniu.SpringBoot.Model.User;
 import org.springframework.data.repository.CrudRepository;
 
 public interface UserRepository extends CrudRepository<User, Long> {}

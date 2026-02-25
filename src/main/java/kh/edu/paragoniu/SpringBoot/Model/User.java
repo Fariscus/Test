@@ -1,4 +1,4 @@
-package hello.test.Model;
+package kh.edu.paragoniu.SpringBoot.Model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank; // ← correct import

@@ -63,4 +63,12 @@ public class Book {
             createdAt = LocalDateTime.now();
         }
     }
+    public boolean isAvailable() {
+        return availableCopies != null && availableCopies > 0;
+    }
+
+    public int getRentedCount() {
+        if (totalCopies == null || availableCopies == null) return 0;
+        return totalCopies - availableCopies;
+    }
 }

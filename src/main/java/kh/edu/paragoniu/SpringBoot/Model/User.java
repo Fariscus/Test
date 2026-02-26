@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @NotBlank(message = "Name is mandatory")
@@ -40,13 +40,11 @@ public class User {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Role role;
 
-    @Column(nullable = false)
-    private boolean active;
+    private Boolean active;
 
-    @Column(nullable = false, updatable = false)
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
@@ -54,7 +52,9 @@ public class User {
         if (role == null) {
             role = Role.USER;
         }
-        active = true;
+        if (active == null) {
+            active = true;
+        }
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }

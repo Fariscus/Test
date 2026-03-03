@@ -5,15 +5,19 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -43,6 +47,16 @@ public class Book {
     @Column(nullable = false)
     private String category;
 
+    private String publication;
+
+    @Column(columnDefinition = "TEXT")
+    private String detail;
+
+    private String branch;
+
+    @PositiveOrZero(message = "Price must be 0 or greater")
+    private BigDecimal price;
+
     @Min(value = 1, message = "Total copies must be at least 1")
     @Column(nullable = false)
     private Integer totalCopies;
@@ -50,6 +64,10 @@ public class Book {
     @Min(value = 0, message = "Available copies cannot be negative")
     @Column(nullable = false)
     private Integer availableCopies;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by_user_id")
+    private User createdByUser;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

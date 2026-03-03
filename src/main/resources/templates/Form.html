@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title th:text="${book.id != null} ? 'Edit Book' : 'Add Book'">Add Book</title>
+    <style layout:fragment="extra-styles">
+        :root {
+            --indigo: #4f46e5; --violet: #7c3aed;
+            --cyan: #06b6d4;   --emerald: #10b981;
+            --amber: #f59e0b;  --rose: #f43f5e;
+        }
+
+        .form-wrap { max-width: 700px; }
+
+        /* Colorful section headers */
+        .sec-head {
+            display: flex; align-items: center; gap: 10px;
+            margin: 1.75rem 0 1rem;
+        }
+        .sec-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .sec-head span {
+            font-size: 0.72rem; font-weight: 800;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            color: #64748b;
+        }
+        .sec-head::after {
+            content: ''; flex: 1;
+            height: 1px; background: #e8edf5;
+        }
+
+        /* Floating label inputs */
+        .field-lbl {
+            font-size: 0.78rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            color: #64748b; margin-bottom: 6px; display: block;
+        }
+
+        .inp {
+            width: 100%;
+            padding: 11px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.9rem; color: #1e293b;
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+        .inp:focus {
+            outline: none;
+            border-color: var(--indigo);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(79,70,229,0.1);
+        }
+        .inp.is-invalid { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(244,63,94,0.1); }
+        .err-msg { font-size: 0.78rem; color: var(--rose); margin-top: 4px; font-weight: 600; }
+
+        textarea.inp { resize: vertical; min-height: 80px; }
+
+        /* Branch cards */
+        .branch-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .branch-card input[type="radio"] { display: none; }
+        .branch-card label {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 6px;
+            padding: 14px 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 0.8rem; font-weight: 700;
+            color: #64748b;
+            text-align: center;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+        .branch-card label .branch-emoji { font-size: 1.4rem; }
+        .branch-card input:checked + label {
+            border-color: var(--indigo);
+            background: linear-gradient(135deg, #eff0ff, #e0e7ff);
+            color: var(--indigo);
+            box-shadow: 0 3px 12px rgba(79,70,229,0.15);
+            transform: translateY(-2px);
+        }
+        .branch-card label:hover {
+            border-color: #a5b4fc;
+            background: #f5f3ff;
+            transform: translateY(-1px);
+        }
+
+        /* Price / Qty row */
+        .prefix-input {
+            position: relative;
+        }
+        .prefix-input .prefix {
+            position: absolute; left: 0; top: 0; bottom: 0;
+            width: 42px;
+            display: flex; align-items: center; justify-content: center;
+            color: #94a3b8; font-weight: 700; font-size: 0.9rem;
+            background: #f1f5f9;
+            border-radius: 12px 0 0 12px;
+            border-right: 2px solid #e2e8f0;
+            pointer-events: none;
+        }
+        .prefix-input .inp { padding-left: 52px; }
+
+        /* Upload zone */
+        .upload-zone {
+            border: 2px dashed #c7d2fe;
+            border-radius: 14px;
+            background: #f5f3ff;
+            padding: 1.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .upload-zone:hover {
+            border-color: var(--indigo);
+            background: #eff0ff;
+        }
+        .upload-zone .uz-icon { font-size: 2.2rem; margin-bottom: 8px; }
+        .upload-zone p { color: #6366f1; font-weight: 700; font-size: 0.9rem; margin: 0 0 3px; }
+        .upload-zone small { color: #94a3b8; font-size: 0.78rem; }
+
+        /* Buttons */
+        .btn-save {
+            padding: 12px 32px;
+            background: linear-gradient(135deg, var(--indigo), var(--violet));
+            border: none; border-radius: 12px;
+            color: #fff; font-family: 'Nunito', sans-serif;
+            font-size: 0.9rem; font-weight: 800;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 5px 18px rgba(79,70,229,0.3);
+        }
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(79,70,229,0.4);
+        }
+        .btn-cancel-lnk {
+            padding: 12px 24px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            color: #64748b; font-weight: 700;
+            font-size: 0.9rem; text-decoration: none;
+            transition: all 0.2s;
+            font-family: 'Nunito', sans-serif;
+        }
+        .btn-cancel-lnk:hover { border-color: #94a3b8; color: #334155; }
+
+        #fileNameTag { font-size: 0.8rem; color: var(--indigo); margin-top: 6px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<th:block layout:fragment="page-icon">📖</th:block>
+<th:block layout:fragment="page-title" th:text="${book.id != null} ? 'Edit Book' : 'Add New Book'">Add Book</th:block>
+
+<div layout:fragment="content">
+
+    <div class="form-wrap">
+        <div class="pg-card">
+
+            <!-- ── FORM ── -->
+            <form th:action="${book.id != null} ? @{/books/edit/{id}(id=${book.id})} : @{/books/add}"
+                  th:object="${book}" method="post" enctype="multipart/form-data">
+
+                <!-- BOOK INFO -->
+                <div class="sec-head">
+                    <div class="sec-dot" style="background:var(--indigo)"></div>
+                    <span>Book Information</span>
+                </div>
+
+                <div class="row g-3 mb-2">
+                    <div class="col-12">
+                        <label class="field-lbl">Book Title *</label>
+                        <input class="inp" th:class="${#fields.hasErrors('title')} ? 'inp is-invalid' : 'inp'"
+                               type="text" th:field="*{title}" placeholder="e.g. Introduction to Algorithms">
+                        <div class="err-msg" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="field-lbl">Author *</label>
+                        <input class="inp" th:class="${#fields.hasErrors('author')} ? 'inp is-invalid' : 'inp'"
+                               type="text" th:field="*{author}" placeholder="e.g. Thomas H. Cormen">
+                        <div class="err-msg" th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="field-lbl">ISBN *</label>
+                        <input class="inp" th:class="${#fields.hasErrors('isbn')} ? 'inp is-invalid' : 'inp'"
+                               type="text" th:field="*{isbn}" placeholder="e.g. 978-0-262-03384-8">
+                        <div class="err-msg" th:if="${#fields.hasErrors('isbn')}" th:errors="*{isbn}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="field-lbl">Category *</label>
+                        <select class="inp" th:class="${#fields.hasErrors('category')} ? 'inp is-invalid' : 'inp'"
+                                th:field="*{category}">
+                            <option value="">-- Select Category --</option>
+                            <option value="Science">Science</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="Fiction">Fiction</option>
+                            <option value="Non-Fiction">Non-Fiction</option>
+                            <option value="History">History</option>
+                            <option value="Reference">Reference</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div class="err-msg" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="field-lbl">Publisher</label>
+                        <input class="inp" type="text" th:field="*{publication}" placeholder="e.g. MIT Press">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="field-lbl">Book Description</label>
+                        <textarea class="inp" th:field="*{detail}" placeholder="Short summary of the book..."></textarea>
+                    </div>
+                </div>
+
+                <!-- BRANCH -->
+                <div class="sec-head">
+                    <div class="sec-dot" style="background:var(--cyan)"></div>
+                    <span>Branch</span>
+                </div>
+                <div class="branch-grid mb-2">
+                    <div class="branch-card">
+                        <input type="radio" id="bOther" th:field="*{branch}" value="Other">
+                        <label for="bOther"><span class="branch-emoji">🏫</span>Other</label>
+                    </div>
+                    <div class="branch-card">
+                        <input type="radio" id="bBSIT" th:field="*{branch}" value="BSIT">
+                        <label for="bBSIT"><span class="branch-emoji">💻</span>BSIT</label>
+                    </div>
+                    <div class="branch-card">
+                        <input type="radio" id="bBSCS" th:field="*{branch}" value="BSCS">
+                        <label for="bBSCS"><span class="branch-emoji">🖥️</span>BSCS</label>
+                    </div>
+                    <div class="branch-card">
+                        <input type="radio" id="bBSSE" th:field="*{branch}" value="BSSE">
+                        <label for="bBSSE"><span class="branch-emoji">⚙️</span>BSSE</label>
+                    </div>
+                </div>
+
+                <!-- STOCK & PRICE -->
+                <div class="sec-head">
+                    <div class="sec-dot" style="background:var(--emerald)"></div>
+                    <span>Stock & Pricing</span>
+                </div>
+                <div class="row g-3 mb-2">
+                    <div class="col-md-6">
+                        <label class="field-lbl">Price ($)</label>
+                        <div class="prefix-input">
+                            <div class="prefix">$</div>
+                            <input class="inp" type="number" th:field="*{price}" min="0" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="field-lbl">Total Copies *</label>
+                        <input class="inp" th:class="${#fields.hasErrors('totalCopies')} ? 'inp is-invalid' : 'inp'"
+                               type="number" th:field="*{totalCopies}" min="1" placeholder="1">
+                        <div class="err-msg" th:if="${#fields.hasErrors('totalCopies')}" th:errors="*{totalCopies}"></div>
+                    </div>
+                </div>
+
+                <!-- PHOTO -->
+                <div class="sec-head">
+                    <div class="sec-dot" style="background:var(--amber)"></div>
+                    <span>Book Cover Photo</span>
+                </div>
+                <div class="upload-zone mb-1" onclick="document.getElementById('photoInp').click()">
+                    <div class="uz-icon">🖼️</div>
+                    <p>Click to upload book cover</p>
+                    <small>PNG, JPG up to 5MB</small>
+                    <input type="file" id="photoInp" name="photo" accept="image/*"
+                           style="display:none" onchange="showFile(this)">
+                </div>
+                <div id="fileNameTag"></div>
+
+                <!-- BUTTONS -->
+                <div class="d-flex align-items-center gap-3 mt-4 pt-2" style="border-top:1px solid #f1f5f9;">
+                    <button type="submit" class="btn-save">
+                        <i class="bi bi-save2-fill me-1"></i>
+                        <span th:text="${book.id != null} ? 'Update Book' : 'Add Book'">Save</span>
+                    </button>
+                    <a href="/books" class="btn-cancel-lnk">↩ Cancel</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script layout:fragment="extra-scripts">
+    function showFile(input) {
+        const tag = document.getElementById('fileNameTag');
+        tag.textContent = input.files[0] ? '📎 ' + input.files[0].name : '';
+    }
+</script>
+</body>
+</html>
